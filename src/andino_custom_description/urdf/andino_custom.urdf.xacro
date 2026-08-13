@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org" name="andino">
+
+  <!-- SOLUCIÓN COMPLETA: Incluimos ÚNICAMENTE el archivo de simulación oficial -->
+  <!-- Este archivo ya contiene internamente el include a la descripción limpia -->
+  <!-- e inyecta los materiales una sola vez en memoria, evitando la duplicidad -->
+  <xacro:include filename="$(find andino_gz)/urdf/andino_gz.urdf.xacro" />
+
+</robot>
+

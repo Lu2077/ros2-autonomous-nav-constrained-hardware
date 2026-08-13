@@ -1,0 +1,51 @@
+services:
+  # Servicio 1: El motor de simulación y lógica central (Back-end / Modo Headless)
+  simulation:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ros2_sim_backend
+    network_mode: host
+    ipc: host
+    shm_size: '2gb'
+    #user: "ros2" # Coincide con el usuario que agregamos al Dockerfile optimizado
+    environment:
+      # Inyección dinámica de paths para Ignition Fortress (Busca los modelos 3D en tus 4 paquetes nuevos)
+      - IGN_GAZEBO_RESOURCE_PATH=/workspace/install/andino_custom_gazebo/share:/workspace/install/andino_custom_description/share:/workspace/install/andino_custom_navigation/share:/workspace/install/andino_custom_bringup/share:/opt/ros/humble/share
+      - GZ_SIM_RESOURCE_PATH=/workspace/install/andino_custom_gazebo/share:/workspace/install/andino_custom_description/share:/workspace/install/andino_custom_navigation/share:/workspace/install/andino_custom_bringup/share:/opt/ros/humble/share
+    volumes:
+      - ../src:/workspace/src
+    tty: true
+    stdin_open: true
+    # Comando maestro: Lanza el bringup indicando simulación (True) y apagando los gráficos (headless:=true)
+    command: bash -c "rm -rf log/ && colcon build --symlink-install && source install/setup.bash && ros2 launch andino_custom_bringup bringup.launch.py use_sim_time:=true headless:=true"
+    restart: unless-stopped
+
+  # Servicio 2: Tu estación de control interactiva (Visualización RViz2, Teleoperación o Depuración)
+  development:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ros2_dev_workspace
+    network_mode: host
+    ipc: host
+    shm_size: '2gb'
+    #user: "ros2"
+    depends_on:
+      - simulation
+    environment:
+      - DISPLAY=${DISPLAY}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+      - XDG_RUNTIME_DIR=/tmp
+      - QT_QPA_PLATFORM=xcb # Estabilidad total gráfica mediante XWayland
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY:-dummy}:/tmp/${WAYLAND_DISPLAY:-dummy}:rw
+      - ../src:/workspace/src
+    tty: true
+    stdin_open: true
+    # Te deja la terminal abierta lista para interactuar (ej. arrancar teleop o rviz2)
+    command: bash -c "bash"
+
+  

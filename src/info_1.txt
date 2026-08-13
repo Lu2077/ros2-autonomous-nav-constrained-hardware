@@ -1,0 +1,41 @@
+$ UID=$(id -u) GID=$(id -g) docker compose -f docker/docker-compose.yaml build
+
+$ UID=$(id -u) GID=$(id -g) docker compose -f docker/docker-compose.yaml up -d
+
+$ UID=$(id -u) GID=$(id -g) docker compose -f docker/docker-compose.yaml down
+
+$ docker exec -it ros2_dev_workspace bash
+
+$ source install/setup.bash
+
+#-----------TODO
+
+$ ros2 launch andino_custom_bringup bringup.launch.py use_sim_time:=true headless:=true launch_rviz:=true
+
+$ ros2 run rqt_graph rqt_graph
+
+#----------TELEOP
+
+$ ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
+
+---------------------------------------------------------------------------------------------------------------------
+
+Fase            | Nodos Necesarios              |Tópicos de Entrada     |Tópicos / TF de Salida                     |
+--------------------------------------------------------------------------------------------------------------------|
+1. Simulación   | gzserver (o ign gazebo -s)    | /joint_states/        | /odom (nav_msgs/Odometry)                 |
+ & TF Base      | robot_state_publisher         | robot_description     | /scan (sensor_msgs/LaserScan)TF:          |
+                |                               |                       |odom → base_link → lidar_link              |
+--------------------------------------------------------------------------------------------------------------------|
+                |                               |                       |                                           |
+2. Mapeo (SLAM) | async_slam_toolbox_node       | /scan/tf              | /map (nav_msgs/OccupancyGrid)TF:          |
+                |                               | (odom → base_link)    | map → odom                                |
+--------------------------------------------------------------------------------------------------------------------|
+3. Visualización| rviz2                         | "/map, /scan, /tf,    | "/initialpose, /goal_pose"                |
+                |                               | /robot_description"   |                                           |
+--------------------------------------------------------------------------------------------------------------------|
+4. Navegación   | controller_server             | /map/scan/,/cmd_vel   | (geometry_msgs/Twist)                     |
+   (Nav2)       | planner_server                | /odom/goal_pose       | /global_costmap/costmap                   |
+                | bt_navigator                  |                       | /local_costmap/costmap                    |
+                | behavior_server               |                       |                                           |
+--------------------------------------------------------------------------------------------------------------------|
