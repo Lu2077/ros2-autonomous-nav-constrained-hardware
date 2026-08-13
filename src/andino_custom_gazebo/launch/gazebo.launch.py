@@ -43,7 +43,7 @@ def launch_setup(context):
         executable='parameter_bridge',
         output='screen',
         parameters=[{
-            'use_sim_time': use_sim_time,
+            #'use_sim_time': use_sim_time,
             'config_file': os.path.join(pkg_custom_gazebo, 'config', 'ros_gz_bridge.yaml')  # <-- Carga limpia
         }]
     )

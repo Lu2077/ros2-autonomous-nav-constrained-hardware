@@ -1,10 +1,30 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org" name="andino">
 
-  <!-- SOLUCIÓN COMPLETA: Incluimos ÚNICAMENTE el archivo de simulación oficial -->
-  <!-- Este archivo ya contiene internamente el include a la descripción limpia -->
-  <!-- e inyecta los materiales una sola vez en memoria, evitando la duplicidad -->
-  <xacro:include filename="$(find andino_gz)/urdf/andino_gz.urdf.xacro" />
+  <!-- 1. Heredamos el modelo físico limpio oficial (Chasis y dimensiones estables) -->
+  <xacro:include filename="$(find andino_description)/urdf/andino.urdf.xacro" />
+
+  <!-- 2. INYECTAMOS UN SOLO PLUGIN DE MOTORES LIMPIO (Evita el doble cálculo y los crash) -->
+  <gazebo>
+    <plugin filename="libignition-gazebo-diff-drive-system.so" name="ignition::gazebo::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>0.137</wheel_separation>
+      <wheel_radius>0.033</wheel_radius>
+      <topic>/model/andino/cmd_vel</topic>
+      <odom_topic>/model/andino/odometry</odom_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+    </plugin>
+
+    <!-- Plugin de Estado de Juntas (Para que ROS mueva las ruedas en RViz) -->
+    <plugin filename="libignition-gazebo-joint-state-publisher-system.so" name="ignition::gazebo::systems::JointStatePublisher">
+      <topic>/model/andino/joint_states</topic>
+      <joint_name>left_wheel_joint</joint_name>
+      <joint_name>right_wheel_joint</joint_name>
+    </plugin>
+  </gazebo>
 
 </robot>
+
 

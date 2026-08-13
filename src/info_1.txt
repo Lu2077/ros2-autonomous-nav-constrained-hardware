@@ -4,6 +4,8 @@ $ UID=$(id -u) GID=$(id -g) docker compose -f docker/docker-compose.yaml up -d
 
 $ UID=$(id -u) GID=$(id -g) docker compose -f docker/docker-compose.yaml down
 
+$ xhost +si:localuser:root
+
 $ docker exec -it ros2_dev_workspace bash
 
 $ source install/setup.bash
@@ -17,6 +19,8 @@ $ ros2 run rqt_graph rqt_graph
 #----------TELEOP
 
 $ ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
+$ ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.1, y: 0.0, z: 0.0}, angular: {z: 0.5}}"
 
 
 ---------------------------------------------------------------------------------------------------------------------
@@ -39,3 +43,18 @@ Fase            | Nodos Necesarios              |Tópicos de Entrada     |Tópic
                 | bt_navigator                  |                       | /local_costmap/costmap                    |
                 | behavior_server               |                       |                                           |
 --------------------------------------------------------------------------------------------------------------------|
+
+----------------->BUGS!
+
+root@lucas-H410M-H:/workspace# ps aux | grep -E "joint_state_publisher|robot_state_publisher"
+root        3955 21.3  0.3 653296 28380 pts/1    Sl+  20:41   0:02 /opt/ros/humble/lib/robot_state_publisher/robot_state_publisher --ros-args -r __node:=robot_state_publisher --params-file /tmp/launch_params_7spzzpqu
+root        4038  0.0  0.0   4044  2224 pts/4    S+   20:42   0:00 grep --color=auto -E joint_state_publisher|robot_state_publisher
+
+----
+
+root@lucas-H410M-H:/workspace# grep -rn "IncludeLaunchDescription" src/
+src/andino_custom_bringup/launch/bringup.launch.py:4:from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+src/andino_custom_bringup/launch/bringup.launch.py:22:    robot_state_pub = IncludeLaunchDescription(
+src/andino_custom_bringup/launch/bringup.launch.py:30:        gazebo_sim = IncludeLaunchDescription(
+src/andino_custom_gazebo/launch/gazebo.launch.py:4:from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+src/andino_custom_gazebo/launch/gazebo.launch.py:24:    gazebo_server = IncludeLaunchDescription(
