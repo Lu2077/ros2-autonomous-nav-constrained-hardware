@@ -4,6 +4,8 @@ $ UID=$(id -u) GID=$(id -g) docker compose -f docker/docker-compose.yaml up -d
 
 $ UID=$(id -u) GID=$(id -g) docker compose -f docker/docker-compose.yaml down
 
+$ pkill -9 -f "parameter_bridge|gz_sim|robot_state_publisher"
+
 $ xhost +si:localuser:root
 
 $ docker exec -it ros2_dev_workspace bash

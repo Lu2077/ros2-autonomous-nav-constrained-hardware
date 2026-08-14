@@ -4,7 +4,7 @@
   gz_type_name: "ignition.msgs.Clock"
   direction: GZ_TO_ROS
 
-- gz_topic_name: "/world/andino_world/model/andino/joint_state"
+- gz_topic_name: "/model/andino/joint_states"
   ros_topic_name: "/joint_states"
   ros_type_name: "sensor_msgs/msg/JointState"
   gz_type_name: "ignition.msgs.Model"

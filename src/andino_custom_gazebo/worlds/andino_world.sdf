@@ -2,10 +2,10 @@
 <sdf version="1.8">
   <world name="andino_world">
     <!-- Configuración del motor de física para simulación estable -->
-    <physics name="1ms" type="ignored">
-      <max_step_size>0.001</max_step_size>
+    <physics name="4ms" type="ignored">
+      <max_step_size>0.004</max_step_size>
       <real_time_factor>1.0</real_time_factor>
-      <real_time_update_rate>1000</real_time_update_rate>
+      <real_time_update_rate>250</real_time_update_rate>
     </physics>
 
     <!-- Plugins esenciales de Ignition para manejar escenas y física -->
